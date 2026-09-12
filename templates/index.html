@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Onyx — Operasyonel Görev &amp; Talep Takip</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        onyx: { 850: '#141820', 900: '#0b0f17', 950: '#07090e' },
+                        accent: { cyan: '#36abca', amber: '#d99c44', emerald: '#10b981' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        [x-cloak] { display: none !important; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #2a3342; border-radius: 3px; }
+    </style>
+</head>
+<body class="bg-onyx-900 text-gray-100 min-h-screen font-sans antialiased">
+    <!-- Top Header -->
+    <header class="border-b border-gray-800 bg-onyx-950/95 backdrop-blur px-4 py-3 sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto flex justify-between items-center gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="w-2.5 h-2.5 bg-accent-cyan rounded-full animate-pulse shadow shadow-cyan-500/50"></div>
+                <h1 class="text-lg sm:text-xl font-bold tracking-wider text-white flex items-center gap-2">
+                    ONYX <span class="text-[10px] px-2 py-0.5 bg-gray-800 text-accent-cyan rounded border border-gray-700 tracking-widest">TICKETING</span>
+                </h1>
+            </div>
+            <div class="text-[11px] sm:text-xs text-gray-400 text-right">
+                Kara Makine &amp; Arel Tarım · Uzaktan Operasyon
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+        <!-- Stats Bar -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            <div class="bg-onyx-850 p-4 rounded-xl border border-gray-800 shadow">
+                <div class="text-[11px] text-gray-400 uppercase tracking-wider">Toplam Talep</div>
+                <div class="text-2xl font-black text-white mt-1">{{ total_tickets }}</div>
+            </div>
+            <div class="bg-onyx-850 p-4 rounded-xl border border-gray-800 shadow">
+                <div class="text-[11px] text-amber-400 uppercase tracking-wider">Açık</div>
+                <div class="text-2xl font-black text-amber-400 mt-1">{{ open_tickets }}</div>
+            </div>
+            <div class="bg-onyx-850 p-4 rounded-xl border border-gray-800 shadow">
+                <div class="text-[11px] text-accent-cyan uppercase tracking-wider">Devam Ediyor</div>
+                <div class="text-2xl font-black text-accent-cyan mt-1">{{ in_progress }}</div>
+            </div>
+            <div class="bg-onyx-850 p-4 rounded-xl border border-gray-800 shadow">
+                <div class="text-[11px] text-emerald-400 uppercase tracking-wider">Tamamlandı</div>
+                <div class="text-2xl font-black text-emerald-400 mt-1">{{ completed }}</div>
+            </div>
+            <div class="bg-onyx-850 p-4 rounded-xl border border-gray-800 shadow col-span-2 sm:col-span-1">
+                <div class="text-[11px] text-purple-400 uppercase tracking-wider">Toplam Efor</div>
+                <div class="text-2xl font-black text-purple-400 mt-1">{{ '%g'|format(total_effort) }} <span class="text-sm font-normal text-gray-400">saat</span></div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Create Form Card -->
+            <div class="bg-onyx-850 p-5 rounded-2xl border border-gray-800 shadow-lg lg:col-span-1 h-fit">
+                <h2 class="text-base font-bold text-white mb-4 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-accent-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    Yeni Görev / Talep Aç
+                </h2>
+                <form action="/tickets/create" method="POST" class="space-y-4">
+                    <div>
+                        <label for="title" class="block text-xs font-medium text-gray-300 mb-1">Başlık *</label>
+                        <input type="text" id="title" name="title" required maxlength="200" class="w-full bg-onyx-950 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500" placeholder="Örn: E-Ticaret pazar yeri API entegrasyonu">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label for="category" class="block text-xs font-medium text-gray-300 mb-1">Kategori</label>
+                            <select id="category" name="category" class="w-full bg-onyx-950 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500">
+                                <option value="Web">Web</option>
+                                <option value="Sosyal Medya">Sosyal Medya</option>
+                                <option value="E-Ticaret">E-Ticaret</option>
+                                <option value="Mobil">Mobil</option>
+                                <option value="Diğer" selected>Diğer</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="priority" class="block text-xs font-medium text-gray-300 mb-1">Öncelik</label>
+                            <select id="priority" name="priority" class="w-full bg-onyx-950 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500">
+                                <option value="Düşük">Düşük</option>
+                                <option value="Normal" selected>Normal</option>
+                                <option value="Yüksek">Yüksek</option>
+                                <option value="Acil">Acil</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="description" class="block text-xs font-medium text-gray-300 mb-1">Açıklama</label>
+                        <textarea id="description" name="description" rows="3" class="w-full bg-onyx-950 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500" placeholder="Görev detayları, yapılacaklar..."></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-500 active:bg-cyan-700 text-white font-semibold py-3 rounded-lg text-sm transition duration-150 shadow touch-manipulation">
+                        Talep Oluştur
+                    </button>
+                </form>
+            </div>
+
+            <!-- Tickets List & Filters -->
+            <div class="bg-onyx-850 p-5 rounded-2xl border border-gray-800 shadow-lg lg:col-span-2 flex flex-col">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+                    <h2 class="text-base font-bold text-white">Görev Listesi</h2>
+                    <form method="GET" action="/" class="flex flex-wrap gap-2 w-full sm:w-auto">
+                        <select name="status" onchange="this.form.submit()" class="bg-onyx-950 border border-gray-700 text-xs rounded-lg px-2.5 py-2 text-gray-200 focus:outline-none focus:border-cyan-500">
+                            <option value="">Tüm Durumlar</option>
+                            <option value="Açık" {% if status_filter == 'Açık' %}selected{% endif %}>Açık</option>
+                            <option value="Devam Ediyor" {% if status_filter == 'Devam Ediyor' %}selected{% endif %}>Devam Ediyor</option>
+                            <option value="Tamamlandı" {% if status_filter == 'Tamamlandı' %}selected{% endif %}>Tamamlandı</option>
+                        </select>
+                        <select name="category" onchange="this.form.submit()" class="bg-onyx-950 border border-gray-700 text-xs rounded-lg px-2.5 py-2 text-gray-200 focus:outline-none focus:border-cyan-500">
+                            <option value="">Tüm Kategoriler</option>
+                            <option value="Web" {% if category_filter == 'Web' %}selected{% endif %}>Web</option>
+                            <option value="Sosyal Medya" {% if category_filter == 'Sosyal Medya' %}selected{% endif %}>Sosyal Medya</option>
+                            <option value="E-Ticaret" {% if category_filter == 'E-Ticaret' %}selected{% endif %}>E-Ticaret</option>
+                            <option value="Mobil" {% if category_filter == 'Mobil' %}selected{% endif %}>Mobil</option>
+                            <option value="Diğer" {% if category_filter == 'Diğer' %}selected{% endif %}>Diğer</option>
+                        </select>
+                        <select name="priority" onchange="this.form.submit()" class="bg-onyx-950 border border-gray-700 text-xs rounded-lg px-2.5 py-2 text-gray-200 focus:outline-none focus:border-cyan-500">
+                            <option value="">Tüm Öncelikler</option>
+                            <option value="Düşük" {% if priority_filter == 'Düşük' %}selected{% endif %}>Düşük</option>
+                            <option value="Normal" {% if priority_filter == 'Normal' %}selected{% endif %}>Normal</option>
+                            <option value="Yüksek" {% if priority_filter == 'Yüksek' %}selected{% endif %}>Yüksek</option>
+                            <option value="Acil" {% if priority_filter == 'Acil' %}selected{% endif %}>Acil</option>
+                        </select>
+                        {% if status_filter or category_filter or priority_filter %}
+                        <a href="/" class="text-xs bg-gray-800 hover:bg-gray-700 px-3 py-2 rounded-lg text-gray-300 flex items-center transition">Sıfırla</a>
+                        {% endif %}
+                    </form>
+                </div>
+
+                <div class="space-y-3 overflow-y-auto max-h-[600px] pr-1 flex-grow">
+                    {% if tickets %}
+                        {% for t in tickets %}
+                        <div class="bg-onyx-950 border border-gray-800 hover:border-gray-600 rounded-xl p-4 transition">
+                            <a href="/tickets/{{ t.id }}" class="block">
+                                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                                    <div class="space-y-1.5 min-w-0">
+                                        <div class="flex items-center gap-2 flex-wrap">
+                                            <span class="text-xs font-mono text-gray-500">#{{ t.id }}</span>
+                                            <span class="text-xs px-2 py-0.5 rounded-full font-medium
+                                                {% if t.status == 'Açık' %} bg-amber-950 text-amber-300 border border-amber-800
+                                                {% elif t.status == 'Devam Ediyor' %} bg-cyan-950 text-cyan-300 border border-cyan-800
+                                                {% else %} bg-emerald-950 text-emerald-300 border border-emerald-800 {% endif %}">
+                                                {{ t.status }}
+                                            </span>
+                                            <span class="text-xs px-2 py-0.5 bg-gray-800 text-gray-300 rounded">{{ t.category }}</span>
+                                            <span class="text-xs px-2 py-0.5 rounded
+                                                {% if t.priority == 'Acil' %} bg-red-950 text-red-400 font-bold border border-red-800
+                                                {% elif t.priority == 'Yüksek' %} bg-orange-950 text-orange-300 border border-orange-800
+                                                {% else %} bg-gray-800 text-gray-400 {% endif %}">
+                                                {{ t.priority }}
+                                            </span>
+                                        </div>
+                                        <h3 class="text-sm font-semibold text-white break-words">{{ t.title }}</h3>
+                                        {% if t.description %}
+                                        <p class="text-xs text-gray-400 line-clamp-1">{{ t.description }}</p>
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-800/70">
+                                        <span class="text-[11px] text-gray-500">{{ t.updated_at }}</span>
+                                        <span class="bg-gray-800 text-white text-xs px-3 py-1.5 rounded-lg font-medium">İncele →</span>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-16 text-gray-500 text-sm">
+                            Kayıtlı görev bulunamadı. Sol taraftan yeni bir talep oluşturun.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <footer class="text-center text-[11px] text-gray-600 pt-2 pb-6">
+            Onyx — Kara Makine &amp; Arel Tarım uzaktan çalışma operasyonu için geliştirilmiştir.
+        </footer>
+    </main>
+</body>
+</html>
