@@ -10,7 +10,6 @@ import {
   Users,
   Webhook,
   LogOut,
-  UserCheck,
   ChevronDown,
 } from "lucide-react";
 
@@ -38,7 +37,6 @@ export function Navbar({ user }: NavbarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [switching, setSwitching] = useState(false);
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -46,21 +44,6 @@ export function Navbar({ user }: NavbarProps) {
     router.refresh();
   }
 
-  async function switchUser(identifier: string, pass: string) {
-    setSwitching(true);
-    try {
-      await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ identifier, password: pass }),
-      });
-      setDropdownOpen(false);
-      router.refresh();
-      window.location.reload();
-    } finally {
-      setSwitching(false);
-    }
-  }
 
   const roleLabels = {
     ADMIN: "Yönetici (Ahmet)",
@@ -207,62 +190,6 @@ export function Navbar({ user }: NavbarProps) {
                       </Link>
                     </div>
                   )}
-
-                  {/* Fast demo account switcher for testing */}
-                  <div className="px-1.5 py-1">
-                    <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 mb-2 px-1">
-                      Hızlı Hesap Geçişi (Demo)
-                    </p>
-                    <div className="space-y-1">
-                      <button
-                        onClick={() => switchUser("ahmet@arel.com", "admin123")}
-                        disabled={switching}
-                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-colors ${
-                          user.role === "ADMIN"
-                            ? "bg-sky-500/20 text-sky-300 font-medium border border-sky-500/30"
-                            : "text-zinc-300 hover:text-white hover:bg-white/5"
-                        }`}
-                      >
-                        <span className="flex items-center gap-2 font-medium">
-                          <UserCheck className="w-4 h-4 text-sky-400" />
-                          Ahmet Bayrak
-                        </span>
-                        <span className="text-[10px] font-mono opacity-80 bg-sky-500/20 px-1.5 py-0.5 rounded">ADMIN</span>
-                      </button>
-
-                      <button
-                        onClick={() => switchUser("sinan@karamakine.com", "user123")}
-                        disabled={switching}
-                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-colors ${
-                          user.username === "sinan"
-                            ? "bg-amber-500/20 text-amber-300 font-medium border border-amber-500/30"
-                            : "text-zinc-300 hover:text-white hover:bg-white/5"
-                        }`}
-                      >
-                        <span className="flex items-center gap-2 font-medium">
-                          <UserCheck className="w-4 h-4 text-amber-400" />
-                          Sinan Kara
-                        </span>
-                        <span className="text-[10px] font-mono opacity-80 bg-amber-500/20 px-1.5 py-0.5 rounded">MANAGER</span>
-                      </button>
-
-                      <button
-                        onClick={() => switchUser("zeynep@karamakine.com", "user123")}
-                        disabled={switching}
-                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-colors ${
-                          user.username === "zeynep"
-                            ? "bg-emerald-500/20 text-emerald-300 font-medium border border-emerald-500/30"
-                            : "text-zinc-300 hover:text-white hover:bg-white/5"
-                        }`}
-                      >
-                        <span className="flex items-center gap-2 font-medium">
-                          <UserCheck className="w-4 h-4 text-emerald-400" />
-                          Zeynep Kara
-                        </span>
-                        <span className="text-[10px] font-mono opacity-80 bg-emerald-500/20 px-1.5 py-0.5 rounded">USER</span>
-                      </button>
-                    </div>
-                  </div>
 
                   <div className="pt-1.5 border-t border-white/5">
                     <button

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Lock, User, ArrowRight, Loader2, Shield, UserCircle2 } from "lucide-react";
+import { Lock, User, ArrowRight, Loader2 } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -36,11 +36,6 @@ export default function LoginPage() {
     } finally {
       setIsLoading(false);
     }
-  }
-
-  function quickLogin(id: string, pass: string) {
-    setIdentifier(id);
-    setPassword(pass);
   }
 
   return (
@@ -124,77 +119,6 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Quick Demo Logins */}
-          <div className="mt-8 pt-6 border-t border-white/5">
-            <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500 block mb-3.5 text-center">
-              Tek Tıkla Demo Hesap Girişi
-            </span>
-
-            <div className="grid grid-cols-1 gap-2.5">
-              <button
-                type="button"
-                onClick={() => quickLogin("ahmet@arel.com", "admin123")}
-                className="flex items-center justify-between p-3.5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.06] text-left transition-all group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20">
-                    <Shield className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="text-sm font-semibold text-white group-hover:text-sky-300">
-                      Ahmet Bayrak
-                    </div>
-                    <div className="text-xs text-zinc-400">Yönetici (Admin)</div>
-                  </div>
-                </div>
-                <span className="text-xs font-mono text-zinc-400 bg-white/5 px-2.5 py-1 rounded-lg">
-                  admin123
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => quickLogin("sinan@karamakine.com", "user123")}
-                className="flex items-center justify-between p-3.5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.06] text-left transition-all group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                    <UserCircle2 className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="text-sm font-semibold text-white group-hover:text-amber-300">
-                      Sinan Kara
-                    </div>
-                    <div className="text-xs text-zinc-400">Müdür (Kara Makine)</div>
-                  </div>
-                </div>
-                <span className="text-xs font-mono text-zinc-400 bg-white/5 px-2.5 py-1 rounded-lg">
-                  user123
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => quickLogin("zeynep@karamakine.com", "user123")}
-                className="flex items-center justify-between p-3.5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.06] text-left transition-all group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    <UserCircle2 className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="text-sm font-semibold text-white group-hover:text-emerald-300">
-                      Zeynep Kara
-                    </div>
-                    <div className="text-xs text-zinc-400">Çalışan (Kullanıcı)</div>
-                  </div>
-                </div>
-                <span className="text-xs font-mono text-zinc-400 bg-white/5 px-2.5 py-1 rounded-lg">
-                  user123
-                </span>
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     </div>
