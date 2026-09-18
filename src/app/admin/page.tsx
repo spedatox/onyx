@@ -14,6 +14,7 @@ import {
   TrendingUp,
   ArrowUpRight,
   Loader2,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -112,13 +113,23 @@ export default function AdminDashboardPage() {
             </p>
           </div>
 
-          <Link
-            href="/admin/settings/webhooks"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white/[0.04] hover:bg-white/[0.08] text-zinc-300 border border-white/[0.08] text-sm font-semibold transition-all shadow-sm"
-          >
-            <span>Speda Webhook Durumu</span>
-            <ArrowUpRight className="w-4 h-4 text-zinc-500" />
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/admin/users"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/30 text-sm font-semibold transition-all shadow-sm"
+            >
+              <Users className="w-4 h-4 text-sky-400" />
+              <span>Kullanıcı Yönetimi</span>
+            </Link>
+
+            <Link
+              href="/admin/settings/webhooks"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white/[0.04] hover:bg-white/[0.08] text-zinc-300 border border-white/[0.08] text-sm font-semibold transition-all shadow-sm"
+            >
+              <span>Speda Webhook Durumu</span>
+              <ArrowUpRight className="w-4 h-4 text-zinc-500" />
+            </Link>
+          </div>
         </div>
 
         {/* 4 Core Focus Metric Cards */}

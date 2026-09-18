@@ -7,6 +7,7 @@ import {
   Ticket,
   Plus,
   LayoutDashboard,
+  Users,
   Webhook,
   LogOut,
   UserCheck,
@@ -78,10 +79,9 @@ export function Navbar({ user }: NavbarProps) {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-white/[0.08] bg-[#06090e]/85 backdrop-blur-2xl transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[72px] flex items-center justify-between">
-        {/* Left: 2026 Lowercase Wordmark & Nav */}
-        <div className="flex items-center gap-10">
+        {/* Left: Lowercase Wordmark & Nav */}
+        <div className="flex items-center gap-8 lg:gap-10">
           <Link href="/tickets" className="flex items-baseline gap-2.5 group select-none">
-            {/* Lowercase modern wordmark: onyx. */}
             <span className="text-2xl sm:text-[26px] font-bold tracking-tight text-white group-hover:text-sky-300 transition-colors font-sans">
               onyx<span className="text-sky-400 font-black text-3xl leading-none">.</span>
             </span>
@@ -91,7 +91,7 @@ export function Navbar({ user }: NavbarProps) {
           </Link>
 
           {user && (
-            <nav className="hidden md:flex items-center gap-2">
+            <nav className="hidden md:flex items-center gap-1.5 lg:gap-2">
               <Link
                 href="/tickets"
                 className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium transition-all ${
@@ -116,6 +116,18 @@ export function Navbar({ user }: NavbarProps) {
                   >
                     <LayoutDashboard className="w-4 h-4 text-sky-400" />
                     <span>Yönetim</span>
+                  </Link>
+
+                  <Link
+                    href="/admin/users"
+                    className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium transition-all ${
+                      pathname.startsWith("/admin/users")
+                        ? "bg-sky-500/15 text-sky-300 border border-sky-500/30"
+                        : "text-zinc-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    <Users className="w-4 h-4 text-sky-400" />
+                    <span>Kullanıcılar</span>
                   </Link>
 
                   <Link
@@ -182,6 +194,19 @@ export function Navbar({ user }: NavbarProps) {
                       Şirketler: {user.organizations.map((o) => o.name).join(", ") || "Genel"}
                     </div>
                   </div>
+
+                  {user.role === "ADMIN" && (
+                    <div className="px-1 py-1 space-y-1">
+                      <Link
+                        href="/admin/users"
+                        onClick={() => setDropdownOpen(false)}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-300 hover:text-white hover:bg-white/5 transition-colors"
+                      >
+                        <Users className="w-4 h-4 text-sky-400" />
+                        <span>Kullanıcı Yönetimi</span>
+                      </Link>
+                    </div>
+                  )}
 
                   {/* Fast demo account switcher for testing */}
                   <div className="px-1.5 py-1">
