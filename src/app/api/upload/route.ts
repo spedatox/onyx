@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     const uniqueSuffix = `${Date.now()}-${crypto.randomBytes(6).toString("hex")}`;
     const storageKey = `upload-${uniqueSuffix}${ext}`;
 
-    const uploadsDir = path.join(process.cwd(), "public", "uploads");
+    const uploadsDir = process.env.UPLOADS_DIR || path.join(process.cwd(), "public", "uploads");
     await fs.mkdir(uploadsDir, { recursive: true });
 
     const filePath = path.join(uploadsDir, storageKey);

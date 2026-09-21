@@ -38,6 +38,13 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
+function isImageAttachment(att: { mimeType?: string; filename?: string }) {
+  return (
+    Boolean(att.mimeType?.startsWith("image/")) ||
+    /\.(png|jpe?g|webp|gif|svg|bmp|ico)$/i.test(att.filename || "")
+  );
+}
+
 export default function TicketDetailPage({ params }: PageProps) {
   const resolvedParams = use(params);
   const ticketId = resolvedParams.id;
@@ -436,8 +443,38 @@ export default function TicketDetailPage({ params }: PageProps) {
               {ticket.attachments?.filter((a: any) => !a.commentId).length > 0 && (
                 <div className="mt-6 pt-5 border-t border-white/5">
                   <span className="text-xs font-semibold text-zinc-400 block mb-3">
-                    Ekli Dosyalar:
+                    Ekli Dosyalar & Görseller:
                   </span>
+
+                  {/* Image Previews */}
+                  {ticket.attachments.filter((a: any) => !a.commentId && isImageAttachment(a)).length > 0 && (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-3.5">
+                      {ticket.attachments
+                        .filter((a: any) => !a.commentId && isImageAttachment(a))
+                        .map((att: any) => (
+                          <a
+                            key={att.id}
+                            href={att.storageKey}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group relative rounded-2xl overflow-hidden border border-white/10 bg-black/40 aspect-video flex items-center justify-center hover:border-sky-500/50 transition-all shadow-md"
+                          >
+                            <img
+                              src={att.storageKey}
+                              alt={att.filename}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              loading="lazy"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2.5">
+                              <span className="text-[11px] text-white truncate font-medium">
+                                {att.filename}
+                              </span>
+                            </div>
+                          </a>
+                        ))}
+                    </div>
+                  )}
+
                   <div className="flex flex-wrap gap-2.5">
                     {ticket.attachments
                       .filter((a: any) => !a.commentId)
@@ -520,19 +557,46 @@ export default function TicketDetailPage({ params }: PageProps) {
                       </p>
 
                       {comment.attachments?.length > 0 && (
-                        <div className="mt-3.5 flex flex-wrap gap-2 pt-3 border-t border-white/5">
-                          {comment.attachments.map((att: any) => (
-                            <a
-                              key={att.id}
-                              href={att.storageKey}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/40 hover:bg-black/60 text-xs text-sky-400 border border-white/5"
-                            >
-                              <Paperclip className="w-3.5 h-3.5" />
-                              <span className="truncate max-w-xs">{att.filename}</span>
-                            </a>
-                          ))}
+                        <div className="mt-3.5 space-y-2.5 pt-3 border-t border-white/5">
+                          {/* Image Previews */}
+                          {comment.attachments.some((a: any) => isImageAttachment(a)) && (
+                            <div className="flex flex-wrap gap-2.5">
+                              {comment.attachments
+                                .filter((a: any) => isImageAttachment(a))
+                                .map((att: any) => (
+                                  <a
+                                    key={att.id}
+                                    href={att.storageKey}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="group relative rounded-xl overflow-hidden border border-white/10 bg-black/40 h-24 w-36 hover:border-sky-500/50 transition-all block"
+                                  >
+                                    <img
+                                      src={att.storageKey}
+                                      alt={att.filename}
+                                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                      loading="lazy"
+                                    />
+                                  </a>
+                                ))}
+                            </div>
+                          )}
+
+                          {/* File Pills */}
+                          <div className="flex flex-wrap gap-2">
+                            {comment.attachments.map((att: any) => (
+                              <a
+                                key={att.id}
+                                href={att.storageKey}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/40 hover:bg-black/60 text-xs text-sky-400 border border-white/5"
+                              >
+                                <Paperclip className="w-3.5 h-3.5" />
+                                <span className="truncate max-w-xs">{att.filename}</span>
+                              </a>
+                            ))}
+                          </div>
                         </div>
                       )}
                     </div>
