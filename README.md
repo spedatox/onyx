@@ -46,7 +46,7 @@ The system is purposely built to avoid the bureaucracy and complexity of enterpr
 | Role | Description & Permissions |
 |---|---|
 | **USER** | Standard team member. Can create tickets, view/comment on own requests, upload files, confirm completion, or reopen recently delivered work. |
-| **MANAGER** | Department or team lead. Can view, track, and comment across organization tickets and create requests on behalf of team members. |
+| **MANAGER** | Patron (Bölüm / Şirket Yetkilisi). Can view, track, and comment across organization tickets and create requests on behalf of team members. |
 | **ADMIN** | Full operational control. Can assign work, change priorities and statuses, record completion proof, manage users and integrations, and view analytics. |
 | **SERVICE** | Machine accounts with scoped API tokens for automated agents and orchestration pipelines. |
 

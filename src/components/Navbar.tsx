@@ -47,7 +47,7 @@ export function Navbar({ user }: NavbarProps) {
 
   const roleLabels = {
     ADMIN: "Yönetici (Ahmet)",
-    MANAGER: "Müdür (Sinan)",
+    MANAGER: "Patron (Sinan)",
     USER: "Kullanıcı",
     SERVICE: "Servis",
   };

@@ -271,7 +271,7 @@ export default function AdminUsersPage() {
 
   const roleLabels: Record<string, string> = {
     ADMIN: "Yönetici (ADMIN)",
-    MANAGER: "Müdür (MANAGER)",
+    MANAGER: "Patron (MANAGER)",
     USER: "Kullanıcı (USER)",
     SERVICE: "Servis (SERVICE)",
   };
@@ -595,7 +595,7 @@ export default function AdminUsersPage() {
                       className="w-full px-3.5 py-2.5 rounded-xl bg-[#06090e] border border-white/10 text-xs sm:text-sm text-white focus:outline-none focus:border-sky-500/50"
                     >
                       <option value="USER">USER (Standart Kullanıcı)</option>
-                      <option value="MANAGER">MANAGER (Bölüm Yöneticisi)</option>
+                      <option value="MANAGER">MANAGER (Patron)</option>
                       <option value="ADMIN">ADMIN (Tam Yetkili)</option>
                       <option value="SERVICE">SERVICE (API / Bot)</option>
                     </select>

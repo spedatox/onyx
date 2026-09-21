@@ -502,6 +502,12 @@ export default function TicketDetailPage({ params }: PageProps) {
                               Yönetici
                             </span>
                           )}
+
+                          {comment.user?.role === "MANAGER" && !comment.isInternal && (
+                            <span className="text-[11px] bg-amber-500/15 text-amber-300 px-2 py-0.5 rounded-md font-medium">
+                              Patron
+                            </span>
+                          )}
                         </div>
 
                         <span className="text-xs text-zinc-500 font-mono">
