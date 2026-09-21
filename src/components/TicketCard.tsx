@@ -3,7 +3,7 @@ import Link from "next/link";
 import { StatusBadge } from "./StatusBadge";
 import { PriorityBadge } from "./PriorityBadge";
 import { formatTicketNumber, formatRelativeTime } from "@/lib/utils";
-import { MessageSquare, Paperclip, Building2, User } from "lucide-react";
+import { MessageSquare, Paperclip, Building2, User, Trash2 } from "lucide-react";
 
 export interface TicketListItem {
   id: string;
@@ -36,13 +36,15 @@ export interface TicketListItem {
 
 interface TicketCardProps {
   ticket: TicketListItem;
+  isAdmin?: boolean;
+  onDelete?: (ticket: TicketListItem) => void;
 }
 
-export function TicketCard({ ticket }: TicketCardProps) {
+export function TicketCard({ ticket, isAdmin, onDelete }: TicketCardProps) {
   return (
     <Link
       href={`/tickets/${ticket.id}`}
-      className="block rounded-3xl bg-[#0c1117]/85 border border-white/[0.08] hover:border-sky-500/35 hover:bg-[#141a24]/90 transition-all p-6 shadow-md hover:shadow-xl hover:shadow-black/40 group backdrop-blur-xl"
+      className="block rounded-3xl bg-[#0c1117]/85 border border-white/[0.08] hover:border-sky-500/35 hover:bg-[#141a24]/90 transition-all p-6 shadow-md hover:shadow-xl hover:shadow-black/40 group backdrop-blur-xl relative"
     >
       <div className="flex items-start justify-between gap-4 mb-3.5">
         <div className="flex items-center gap-2 flex-wrap">
@@ -63,6 +65,20 @@ export function TicketCard({ ticket }: TicketCardProps) {
         <div className="flex items-center gap-2 flex-shrink-0">
           <PriorityBadge priority={ticket.priority} />
           <StatusBadge status={ticket.status} />
+          {isAdmin && onDelete && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onDelete(ticket);
+              }}
+              className="p-1.5 rounded-lg text-zinc-500 hover:text-red-400 hover:bg-red-500/15 transition-all opacity-0 group-hover:opacity-100 focus:opacity-100"
+              title="Talebi Sil"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
 

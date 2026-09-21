@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getUserByBearerToken } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { dispatchWebhookEvent } from "@/lib/webhooks";
+import fs from "fs/promises";
+import path from "path";
 
 async function authenticateSpeda(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
@@ -199,6 +201,52 @@ export async function POST(req: NextRequest) {
       });
 
       return NextResponse.json({ success: true, ticket: completed });
+    }
+
+    if (action === "delete_ticket") {
+      const fullTicket = await prisma.ticket.findUnique({
+        where: { id: ticket.id },
+        include: { attachments: true, organization: true },
+      });
+
+      const uploadsDir = process.env.UPLOADS_DIR || path.join(process.cwd(), "public", "uploads");
+      if (fullTicket?.attachments) {
+        for (const att of fullTicket.attachments) {
+          if (att.storageKey) {
+            try {
+              const filename = path.basename(att.storageKey);
+              const filePath = path.join(uploadsDir, filename);
+              await fs.unlink(filePath).catch(() => {});
+            } catch {
+              // Ignore disk cleanup errors
+            }
+          }
+        }
+      }
+
+      await prisma.ticket.delete({
+        where: { id: ticket.id },
+      });
+
+      dispatchWebhookEvent("ticket.deleted", {
+        id: ticket.id,
+        ticket_number: ticket.ticketNumber,
+        public_id: `#${ticket.ticketNumber}`,
+        title: ticket.title,
+        organization: {
+          id: ticket.organization.id,
+          name: ticket.organization.name,
+          slug: ticket.organization.slug,
+        },
+        deleted_by: {
+          actor: "Speda Service",
+        },
+      });
+
+      return NextResponse.json({
+        success: true,
+        message: `Ticket #${ticket.ticketNumber} deleted successfully.`,
+      });
     }
 
     return NextResponse.json({ error: "Unknown action or missing parameters" }, { status: 400 });

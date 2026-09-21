@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/Navbar";
 import { TicketCard, TicketListItem } from "@/components/TicketCard";
+import { DeleteModal } from "@/components/DeleteModal";
 import {
   Inbox,
   Play,
@@ -28,6 +29,7 @@ export default function AdminDashboardPage() {
   const [tabTickets, setTabTickets] = useState<TicketListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isTicketsLoading, setIsTicketsLoading] = useState(false);
+  const [ticketToDelete, setTicketToDelete] = useState<TicketListItem | null>(null);
 
   useEffect(() => {
     async function loadMetrics() {
@@ -248,7 +250,12 @@ export default function AdminDashboardPage() {
             ) : (
               <div className="space-y-4">
                 {tabTickets.map((t) => (
-                  <TicketCard key={t.id} ticket={t} />
+                  <TicketCard
+                    key={t.id}
+                    ticket={t}
+                    isAdmin={true}
+                    onDelete={(ticket) => setTicketToDelete(ticket)}
+                  />
                 ))}
               </div>
             )}
@@ -319,6 +326,26 @@ export default function AdminDashboardPage() {
           </div>
         </div>
       </main>
+
+      {ticketToDelete && (
+        <DeleteModal
+          isOpen={Boolean(ticketToDelete)}
+          onClose={() => setTicketToDelete(null)}
+          ticketId={ticketToDelete.id}
+          ticketNumber={ticketToDelete.ticketNumber}
+          ticketTitle={ticketToDelete.title}
+          onDeleted={() => {
+            setTabTickets((prev) => prev.filter((item) => item.id !== ticketToDelete.id));
+            setTicketToDelete(null);
+            fetch("/api/admin/metrics")
+              .then((res) => (res.ok ? res.json() : null))
+              .then((data) => {
+                if (data?.metrics) setMetrics(data.metrics);
+              })
+              .catch(() => {});
+          }}
+        />
+      )}
     </div>
   );
 }

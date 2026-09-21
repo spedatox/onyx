@@ -42,3 +42,7 @@ export function canChangePriority(user: SessionUser): boolean {
 export function canAccessAdmin(user: SessionUser): boolean {
   return user.role === "ADMIN";
 }
+
+export function canDeleteTicket(user: SessionUser): boolean {
+  return user.role === "ADMIN";
+}

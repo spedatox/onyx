@@ -8,6 +8,7 @@ import { PriorityBadge } from "@/components/PriorityBadge";
 import { CompletionModal } from "@/components/CompletionModal";
 import { WaitingModal } from "@/components/WaitingModal";
 import { CancelModal } from "@/components/CancelModal";
+import { DeleteModal } from "@/components/DeleteModal";
 import {
   formatTicketNumber,
   formatDate,
@@ -31,6 +32,7 @@ import {
   XCircle,
   FileText,
   Check,
+  Trash2,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -64,6 +66,7 @@ export default function TicketDetailPage({ params }: PageProps) {
   const [isCompletionOpen, setIsCompletionOpen] = useState(false);
   const [isWaitingOpen, setIsWaitingOpen] = useState(false);
   const [isCancelOpen, setIsCancelOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   async function loadTicket() {
     try {
@@ -333,6 +336,17 @@ export default function TicketDetailPage({ params }: PageProps) {
                     </option>
                   ))}
                 </select>
+              )}
+
+              {isAdmin && (
+                <button
+                  onClick={() => setIsDeleteOpen(true)}
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-zinc-400 hover:text-red-400 hover:bg-red-500/10 border border-white/5 hover:border-red-500/25 text-xs font-semibold transition-all shadow-sm active:scale-95"
+                  title="Talebi Kalıcı Olarak Sil"
+                >
+                  <Trash2 className="w-4 h-4 text-red-400" />
+                  <span>Talebi Sil</span>
+                </button>
               )}
             </div>
           </div>
@@ -748,6 +762,15 @@ export default function TicketDetailPage({ params }: PageProps) {
         ticketId={ticket.id}
         ticketNumber={ticket.ticketNumber}
         onCancelled={loadTicket}
+      />
+
+      <DeleteModal
+        isOpen={isDeleteOpen}
+        onClose={() => setIsDeleteOpen(false)}
+        ticketId={ticket.id}
+        ticketNumber={ticket.ticketNumber}
+        ticketTitle={ticket.title}
+        onDeleted={() => router.push("/tickets")}
       />
     </div>
   );

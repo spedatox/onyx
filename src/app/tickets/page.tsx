@@ -4,6 +4,7 @@ import React, { useState, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/Navbar";
 import { TicketCard, TicketListItem } from "@/components/TicketCard";
+import { DeleteModal } from "@/components/DeleteModal";
 import {
   Search,
   Plus,
@@ -29,6 +30,7 @@ export default function TicketsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedOrg, setSelectedOrg] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
+  const [ticketToDelete, setTicketToDelete] = useState<TicketListItem | null>(null);
   const [, startTransition] = useTransition();
 
   useEffect(() => {
@@ -210,11 +212,30 @@ export default function TicketsPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {tickets.map((ticket) => (
-              <TicketCard key={ticket.id} ticket={ticket} />
+              <TicketCard
+                key={ticket.id}
+                ticket={ticket}
+                isAdmin={currentUser?.role === "ADMIN"}
+                onDelete={(t) => setTicketToDelete(t)}
+              />
             ))}
           </div>
         )}
       </main>
+
+      {ticketToDelete && (
+        <DeleteModal
+          isOpen={Boolean(ticketToDelete)}
+          onClose={() => setTicketToDelete(null)}
+          ticketId={ticketToDelete.id}
+          ticketNumber={ticketToDelete.ticketNumber}
+          ticketTitle={ticketToDelete.title}
+          onDeleted={() => {
+            setTickets((prev) => prev.filter((item) => item.id !== ticketToDelete.id));
+            setTicketToDelete(null);
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { canViewTicket, canViewInternalNotes } from "@/lib/permissions";
+import { canViewTicket, canViewInternalNotes, canDeleteTicket } from "@/lib/permissions";
 import { dispatchWebhookEvent } from "@/lib/webhooks";
+import fs from "fs/promises";
+import path from "path";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -244,6 +246,84 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     console.error("PATCH ticket error:", err);
     return NextResponse.json(
       { error: "Talep güncellenirken hata oluştu: " + errorMessage },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(req: NextRequest, { params }: RouteParams) {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ error: "Yetkisiz erişim" }, { status: 401 });
+    }
+
+    if (!canDeleteTicket(user)) {
+      return NextResponse.json(
+        { error: "Talepleri silme yetkisi yalnızca yöneticilere (ADMIN) aittir." },
+        { status: 403 }
+      );
+    }
+
+    const { id } = await params;
+    const ticket = await prisma.ticket.findUnique({
+      where: { id },
+      include: {
+        organization: true,
+        createdBy: true,
+        attachments: true,
+      },
+    });
+
+    if (!ticket) {
+      return NextResponse.json({ error: "Talep bulunamadı" }, { status: 404 });
+    }
+
+    // Attempt to clean up physical attachment files on disk
+    const uploadsDir = process.env.UPLOADS_DIR || path.join(process.cwd(), "public", "uploads");
+    for (const att of ticket.attachments) {
+      if (att.storageKey) {
+        try {
+          const filename = path.basename(att.storageKey);
+          const filePath = path.join(uploadsDir, filename);
+          await fs.unlink(filePath).catch(() => {});
+        } catch {
+          // Ignore disk unlink errors
+        }
+      }
+    }
+
+    // Delete ticket from database. Comments, events, and attachments cascade delete per Prisma schema.
+    await prisma.ticket.delete({
+      where: { id },
+    });
+
+    // Dispatch webhook event
+    dispatchWebhookEvent("ticket.deleted", {
+      id: ticket.id,
+      ticket_number: ticket.ticketNumber,
+      public_id: `#${ticket.ticketNumber}`,
+      title: ticket.title,
+      organization: {
+        id: ticket.organization.id,
+        name: ticket.organization.name,
+        slug: ticket.organization.slug,
+      },
+      deleted_by: {
+        id: user.id,
+        name: user.fullName,
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: `Talep #${ticket.ticketNumber} başarıyla silindi.`,
+    });
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : "Bilinmeyen hata";
+    console.error("DELETE ticket error:", err);
+    return NextResponse.json(
+      { error: "Talep silinirken bir hata oluştu: " + errorMessage },
       { status: 500 }
     );
   }
