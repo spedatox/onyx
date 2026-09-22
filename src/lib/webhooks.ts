@@ -8,23 +8,24 @@ export type WebhookEventType =
   | "ticket.status.changed"
   | "ticket.priority.changed"
   | "ticket.completed"
-  | "ticket.reopened";
+  | "ticket.reopened"
+  | "ticket.deleted";
 
 export interface TicketWebhookPayload {
   id: string;
   ticket_number: number;
   public_id: string;
   title: string;
-  description: string;
-  status: string;
-  priority: string;
-  category: string;
+  description?: string;
+  status?: string;
+  priority?: string;
+  category?: string;
   organization: {
     id: string;
     name: string;
     slug: string;
   };
-  requester: {
+  requester?: {
     id: string;
     name: string;
     email: string;
@@ -36,8 +37,13 @@ export interface TicketWebhookPayload {
   target_date?: string | null;
   waiting_reason?: string | null;
   completion_summary?: string | null;
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
+  deleted_by?: {
+    id?: string;
+    name?: string;
+    actor?: string;
+  };
 }
 
 export async function dispatchWebhookEvent(
